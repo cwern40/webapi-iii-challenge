@@ -70,7 +70,7 @@ router.delete('/:id', validateUserId, (req, res) => {
 });
 
 router.put('/:id', validateUserId, (req, res) => {
-    Users.update(req.params.id)
+    Users.update(req.params.id, req.body)
         .then(update => {
             res.status(200).json(update)
         })
@@ -122,7 +122,17 @@ function validateUser(req, res, next) {
 };
 
 function validatePost(req, res, next) {
-
+    if (!req.body || !Object.keys(req.body).length > 0) {
+        res.status(400).json({
+            message: 'Missing user data'
+        })
+    } else if (!req.body.text) {
+        res.status(400).json({
+            message: 'Missing required name field'
+        })
+    } else {
+        next()
+    }
 };
 
 module.exports = router;
