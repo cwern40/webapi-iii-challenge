@@ -25,8 +25,19 @@ router.get('/', (req, res) => {
         })
 });
 
-router.get('/:id', (req, res) => {
-
+router.get('/:id', validateUserId, (req, res) => {
+    const { id } = req.params
+    
+    Users.getById(id)
+        .then(user => {
+            res.status(201).json(user)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                message: 'Error retrieving user data'
+            })
+        })
 });
 
 router.get('/:id/posts', (req, res) => {
@@ -46,7 +57,7 @@ router.put('/:id', (req, res) => {
 function validateUserId(req, res, next) {
     const { id } = req.params;
 
-    Posts.getById(id)
+    Users.getById(id)
         .then(post => {
             if (post) {
                 req.user = post
