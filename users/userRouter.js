@@ -4,8 +4,17 @@ const router = express.Router();
 
 const Users = require('./userDb')
 
-router.post('/', (req, res) => {
-
+router.post('/', validateUser, (req, res) => {
+    Users.insert(req.body)
+        .then(user => {
+            res.status(201).json(user)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                message: 'Error creating user'
+            })
+        })
 });
 
 router.post('/:id/posts', (req, res) => {
@@ -78,9 +87,9 @@ function validateUserId(req, res, next) {
 };
 
 function validateUser(req, res, next) {
-    if (!req.body || !Object.keys(re.body).length > 0) {
+    if (!req.body || !Object.keys(req.body).length > 0) {
         res.status(400).json({
-            message: 'missing user data'
+            message: 'Missing user data'
         })
     } else if (!req.body.name) {
         res.status(400).json({
