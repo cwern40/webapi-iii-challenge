@@ -35,4 +35,26 @@ function validatePostId(req, res, next) {
 
 };
 
+function validateUserId(req, res, next) {
+    const { id } = req.params;
+
+    Posts.getById(id)
+        .then(post => {
+            if (post) {
+                req.user = post
+                next();
+            } else {
+                res.status(404).json({
+                    message: 'Invalid user id'
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                message: 'Error processing the request'
+            })
+        })
+};
+
 module.exports = router;
