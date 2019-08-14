@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const Users = require('./userDb')
+const Posts = require('../posts/postDb')
 
 router.post('/', validateUser, (req, res) => {
     Users.insert(req.body)
@@ -17,8 +18,19 @@ router.post('/', validateUser, (req, res) => {
         })
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+    const postInfo = { ...req.body, user_id: req.params.id }    
 
+    Posts.insert(postInfo)
+        .then(post => {
+            res.status(201).json(post)
+        })
+        .catch(err => {
+            console.log(err, postInfo)
+            res.status(500).json({
+                message: 'Error creating post'
+            })
+        })
 });
 
 router.get('/', (req, res) => {
@@ -50,6 +62,18 @@ router.get('/:id', validateUserId, (req, res) => {
 });
 
 router.get('/:id/posts', (req, res) => {
+    const { id } = req.params
+
+    Users.getUserPosts(id)
+        .then(posts => {
+            res.status(200).json(posts)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                message: 'Error retrieving posts'
+            })
+        })
 
 });
 
@@ -128,7 +152,7 @@ function validatePost(req, res, next) {
         })
     } else if (!req.body.text) {
         res.status(400).json({
-            message: 'Missing required name field'
+            message: 'Missing required text field'
         })
     } else {
         next()
