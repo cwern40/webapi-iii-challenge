@@ -17,8 +17,20 @@ router.get('/', (req, res) => {
         })
 });
 
-router.get('/:id', (req, res) => {
+//Get request to get a post by a specific id
+router.get('/:id', validatePostId, (req, res) => {
+    const { id } = req.params
 
+    Posts.getById(id)
+    .then(post => {
+        res.status(201).json(post);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            message: 'Error retrieving post data'
+        })
+    })
 });
 
 router.delete('/:id', (req, res) => {
@@ -32,10 +44,6 @@ router.put('/:id', (req, res) => {
 // custom middleware
 
 function validatePostId(req, res, next) {
-
-};
-
-function validateUserId(req, res, next) {
     const { id } = req.params;
 
     Posts.getById(id)
@@ -45,7 +53,7 @@ function validateUserId(req, res, next) {
                 next();
             } else {
                 res.status(404).json({
-                    message: 'Invalid user id'
+                    message: 'Invalid post id'
                 })
             }
         })
