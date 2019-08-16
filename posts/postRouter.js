@@ -33,12 +33,35 @@ router.get('/:id', validatePostId, (req, res) => {
     })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validatePostId, (req, res) => {
+    const { id } = req.params
 
+    Posts.remove(id)
+        .then(remove => {
+            res.status(200).json({
+                message: "the post has been removed."
+            })
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: "error removing post"
+            })
+        })
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validatePostId, (req, res) => {
 
+    Posts.update( req.params.id, req.body)
+        .then(update => {
+            res.status(201).json(update)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                error: "error updating post"
+            })
+        })
 });
 
 // custom middleware

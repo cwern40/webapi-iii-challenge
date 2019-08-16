@@ -61,7 +61,7 @@ router.get('/:id', validateUserId, (req, res) => {
         })
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId, (req, res) => {
     const { id } = req.params
 
     Users.getUserPosts(id)
